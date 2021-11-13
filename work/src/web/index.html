@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    </head>
+    <div class="main">
+        <div class="main-header">
+            <h1>pool<h1>
+        </div>
+        <hr>
+        <div class="main-body">
+            <div class="main-body-form">
+                <div class="main-body-form-upload">
+                    <form action="/api/push" method="post" enctype="multipart/form-data">
+                        <div>
+                            <input type="file" id="file" name="files" multiple>
+                            <button>upload</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="main-body-form-remove">
+                    <input type="text" class="main-body-form-remove-textfield" onchange="removeFiles()">
+                    <input type="button" class="main-body-form-remove-button" value="remove" onclick="removeFiles()">
+                </div>
+                <div class="main-body-form-search">
+                    <input type="text" class="main-body-form-search-textfield" onchange="searchFiles()">
+                    <input type="button" class="main-body-form-search-button" value="search" onclick="searchFiles()">
+                </div>
+            </div>
+            <hr>
+            <div class="main-body-table">
+                <table>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</html>
+
+<script>
+
+    document.onload = renderTable()
+
+    async function renderTable(filter = '') {
+        const table = document.querySelector('tbody')
+        const files = (await (await fetch(`/api/list/${filter}`)).json())
+        const rows = []
+        var i = 0
+        while(i < files.length){
+            var row = '<tr>'
+            for(var c = 0; c < 10; c++){
+                if(files[i] == undefined){break}
+                row = `${row}<td><a href='/api/get/${files[i]}'>${files[i]}</a></td>`
+                i++
+            }
+            rows.push(`${row}</tr>`)
+        }
+        table.innerHTML = rows.toString()
+    }
+
+    async function removeFiles(){
+        const filter = document.querySelector('.main-body-form-remove-textfield').value
+        await fetch(`/api/rm/${filter}`)
+        renderTable()
+    }
+
+    async function searchFiles(){
+        const filter = document.querySelector('.main-body-form-search-textfield').value
+        renderTable(filter) 
+    }
+
+</script>
+
+<style>
+    .main{
+        margin: 5rem !important;
+    }
+    .main-body-form{
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+    }
+    .main-body-form div {
+        margin: 0 1rem;
+    }
+    table {
+        width: 100%;
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+    .main-body-table td {
+        border: 1px solid black;
+        width: calc(100% / 10);
+        text-align: center;
+    }
+
+</style>

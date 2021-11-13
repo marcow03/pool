@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid'
 import archiver from 'archiver'
 
 export const pool = `${path.resolve(__dirname, '..')}/pool`
+export const web = `${path.resolve(__dirname, '..')}/src/web`
 const tmp = `${path.resolve(__dirname, '..')}/tmp`
 
 export const filterPool = (filter: string) => {

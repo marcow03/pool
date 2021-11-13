@@ -13,11 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const multer_1 = __importDefault(require("multer"));
 const morgan_1 = __importDefault(require("morgan"));
 const library_1 = require("./library");
 const app = (0, express_1.default)();
 const port = 8080;
 app.use((0, morgan_1.default)('short'));
+app.use(express_1.default.static(library_1.web));
 app.get('/api/list/:filter?', (req, res) => {
     const files = (0, library_1.filterPool)(req.params.filter);
     res.send(files);
@@ -39,6 +41,13 @@ app.get('/api/rm/:filter?', (req, res) => __awaiter(void 0, void 0, void 0, func
     const files = yield (0, library_1.cleanPool)(req.params.filter);
     res.send(files);
 }));
+const upload = (0, multer_1.default)({ storage: multer_1.default.diskStorage({
+        destination(req, file, callback) { callback(null, library_1.pool); },
+        filename(req, file, callback) { callback(null, file.originalname); }
+    }) }).array('files');
+app.post('/api/push', upload, (req, res) => {
+    res.redirect('/');
+});
 app.listen(port, () => {
     // tslint:disable-next-line:no-console
     console.log(`server startet at http://0.0.0.0:${port}`);
