@@ -1,20 +1,27 @@
 import path from 'path'
-import { copyFileSync, createWriteStream, mkdirSync, readdirSync, rmSync, WriteStream } from 'fs';
+import { copyFileSync, createWriteStream, mkdirSync, readdirSync, readFileSync, rmSync, WriteStream } from 'fs';
 import { v4 as uuidv4 } from 'uuid'
 import archiver from 'archiver'
 
 export const pool = `${path.resolve(__dirname, '..')}/pool`
-export const web = `${path.resolve(__dirname, '..')}/src/web`
+export const web = `${path.resolve(__dirname, '..')}/static`
 const tmp = `${path.resolve(__dirname, '..')}/tmp`
 
-export const filterPool = (filter: string) => {
+export const filterPool = (filter: string, method?: string) => {
+    if(isEmpty(method)){method = 'match'}
     let files: string[] = []
     if(isEmpty(filter)){
         files = readdirSync(pool)
     } else {
         readdirSync(pool).forEach(file => {
-            if(file.match(filter)){
-                files.push(file)
+            if(method === 'match'){
+                if(file.match(filter)){
+                    files.push(file)
+                }
+            } else if (method === 'exact'){
+                if(filter === file.substring(file.lastIndexOf('/'))){
+                    files.push(file)
+                }
             }
         })
     }
@@ -40,18 +47,14 @@ export const cleanTmp = async (pattern: string) => {
     rmSync(pattern.split('.')[0], {recursive: true})
 }
 
-export const cleanPool = async (filter: string) => {
-    const files: string[] = []
-    readdirSync(pool).forEach(file => {
-        if(isEmpty(filter)){
-            rmSync(`${pool}/${file}`)
-            files.push(file)
-        } else if(file.match(filter)){
-            rmSync(`${pool}/${file}`)
-            files.push(file)
-        }
+export const cleanPool = async (files: string[]) => {
+    files.forEach(file => {
+        rmSync(`${pool}/${file}`)
     })
-    return files
+}
+
+export const getContent = async (file: string) => {
+    return readFileSync(`${pool}/${file}`, 'utf8')
 }
 
 export const isEmpty = (value: string | any[]) => {
@@ -59,6 +62,8 @@ export const isEmpty = (value: string | any[]) => {
         return (!value || value.length === 0)
     } else if(Array.isArray(value)){
         return (value.length === 0 ? true : false)
+    } else if(value === undefined){
+        return true
     } else {
         return false
     }

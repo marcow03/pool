@@ -20,12 +20,12 @@ const app = (0, express_1.default)();
 const port = 8080;
 app.use((0, morgan_1.default)('short'));
 app.use(express_1.default.static(library_1.web));
-app.get('/api/list/:filter?', (req, res) => {
-    const files = (0, library_1.filterPool)(req.params.filter);
+app.get('/api/list/:filter?/:method?', (req, res) => {
+    const files = (0, library_1.filterPool)(req.params.filter, req.params.method);
     res.send(files);
 });
-app.get('/api/get/:filter?', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const files = (0, library_1.filterPool)(req.params.filter);
+app.get('/api/pull/:filter?/:method?', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const files = (0, library_1.filterPool)(req.params.filter, req.params.method);
     if (files.length === 1) {
         res.sendFile(`${library_1.pool}/${files[0]}`);
     }
@@ -37,9 +37,20 @@ app.get('/api/get/:filter?', (req, res) => __awaiter(void 0, void 0, void 0, fun
         res.send('no file found');
     }
 }));
-app.get('/api/rm/:filter?', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const files = yield (0, library_1.cleanPool)(req.params.filter);
-    res.send(files);
+app.get('/api/rm/:filter?/:method?', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const files = (0, library_1.filterPool)(req.params.filter, req.params.method !== undefined ? req.params.method : 'exact');
+    yield (0, library_1.cleanPool)(files);
+    res.sendStatus(200);
+}));
+app.get('/api/get/:file', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const files = (0, library_1.filterPool)(req.params.file, 'exact');
+    if (files.length === 1) {
+        const file = yield (0, library_1.getContent)(files[0]);
+        res.send(file);
+    }
+    else {
+        res.send('none or multiple file found');
+    }
 }));
 const upload = (0, multer_1.default)({ storage: multer_1.default.diskStorage({
         destination(req, file, callback) { callback(null, library_1.pool); },

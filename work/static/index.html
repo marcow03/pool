@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <link rel="shortcut icon" href="favicon.png">
     </head>
     <div class="main">
         <div class="main-header">
             <h1>pool<h1>
+            <img src="favicon.png" width="50px">
         </div>
         <hr>
         <div class="main-body">
@@ -18,7 +20,7 @@
                     </form>
                 </div>
                 <div class="main-body-form-remove">
-                    <input type="text" class="main-body-form-remove-textfield" onchange="removeFiles()">
+                    <input type="text" class="main-body-form-remove-textfield">
                     <input type="button" class="main-body-form-remove-button" value="remove" onclick="removeFiles()">
                 </div>
                 <div class="main-body-form-search">
@@ -50,12 +52,12 @@
             var row = '<tr>'
             for(var c = 0; c < 10; c++){
                 if(files[i] == undefined){break}
-                row = `${row}<td><a href='/api/get/${files[i]}'>${files[i]}</a></td>`
+                row = `${row}<td><a href='/api/pull/${files[i]}'>${files[i]}</a></td>`
                 i++
             }
             rows = rows + row
         }
-        table.innerHTML = rows.toString()
+        table.innerHTML = rows
     }
 
     async function removeFiles(){
@@ -74,6 +76,10 @@
 <style>
     .main{
         margin: 5rem !important;
+    }
+    .main-header {
+        display: flex;
+        justify-content: space-between;
     }
     .main-body-form{
         display: flex;
