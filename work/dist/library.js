@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isEmpty = exports.getContent = exports.cleanPool = exports.cleanTmp = exports.makeZip = exports.filterPool = exports.web = exports.pool = void 0;
+exports.isEmpty = exports.getContent = exports.cleanPool = exports.cleanTmp = exports.makeZip = exports.filterPool = exports.initWorkspace = exports.web = exports.pool = void 0;
 const path_1 = __importDefault(require("path"));
 const fs_1 = require("fs");
 const uuid_1 = require("uuid");
@@ -20,9 +20,18 @@ const archiver_1 = __importDefault(require("archiver"));
 exports.pool = `${path_1.default.resolve(__dirname, '..')}/pool`;
 exports.web = `${path_1.default.resolve(__dirname, '..')}/static`;
 const tmp = `${path_1.default.resolve(__dirname, '..')}/tmp`;
-const filterPool = (filter, method) => {
-    if ((0, exports.isEmpty)(method)) {
-        method = 'match';
+const initWorkspace = () => {
+    if (!(0, fs_1.existsSync)(exports.pool)) {
+        (0, fs_1.mkdirSync)(exports.pool);
+    }
+    if (!(0, fs_1.existsSync)(tmp)) {
+        (0, fs_1.mkdirSync)(tmp);
+    }
+};
+exports.initWorkspace = initWorkspace;
+const filterPool = (filter, method = 'exact') => {
+    if (filter === '*') {
+        filter = '';
     }
     let files = [];
     if ((0, exports.isEmpty)(filter)) {

@@ -20,8 +20,9 @@ const app = (0, express_1.default)();
 const port = 8080;
 app.use((0, morgan_1.default)('short'));
 app.use(express_1.default.static(library_1.web));
+(0, library_1.initWorkspace)();
 app.get('/api/list/:filter?/:method?', (req, res) => {
-    const files = (0, library_1.filterPool)(req.params.filter, req.params.method);
+    const files = (0, library_1.filterPool)(req.params.filter, req.params.method !== undefined ? req.params.method : 'match');
     res.send(files);
 });
 app.get('/api/pull/:filter?/:method?', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -38,18 +39,18 @@ app.get('/api/pull/:filter?/:method?', (req, res) => __awaiter(void 0, void 0, v
     }
 }));
 app.get('/api/rm/:filter?/:method?', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const files = (0, library_1.filterPool)(req.params.filter, req.params.method !== undefined ? req.params.method : 'exact');
+    const files = (0, library_1.filterPool)(req.params.filter, req.params.method);
     yield (0, library_1.cleanPool)(files);
-    res.sendStatus(200);
+    res.redirect('/');
 }));
 app.get('/api/get/:file', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const files = (0, library_1.filterPool)(req.params.file, 'exact');
     if (files.length === 1) {
         const file = yield (0, library_1.getContent)(files[0]);
-        res.send(file);
+        res.setHeader("Content-Type", "text/plain").send(file);
     }
     else {
-        res.send('none or multiple file found');
+        res.send('none or multiple files found');
     }
 }));
 const upload = (0, multer_1.default)({ storage: multer_1.default.diskStorage({

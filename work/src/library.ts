@@ -1,5 +1,5 @@
 import path from 'path'
-import { copyFileSync, createWriteStream, mkdirSync, readdirSync, readFileSync, rmSync, WriteStream } from 'fs';
+import { copyFileSync, createWriteStream, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, WriteStream } from 'fs';
 import { v4 as uuidv4 } from 'uuid'
 import archiver from 'archiver'
 
@@ -7,8 +7,13 @@ export const pool = `${path.resolve(__dirname, '..')}/pool`
 export const web = `${path.resolve(__dirname, '..')}/static`
 const tmp = `${path.resolve(__dirname, '..')}/tmp`
 
-export const filterPool = (filter: string, method?: string) => {
-    if(isEmpty(method)){method = 'match'}
+export const initWorkspace = () => {
+    if(!existsSync(pool)){mkdirSync(pool)}
+    if(!existsSync(tmp)){mkdirSync(tmp)}
+}
+
+export const filterPool = (filter: string, method: string = 'exact') => {
+    if(filter === '*'){filter = ''}
     let files: string[] = []
     if(isEmpty(filter)){
         files = readdirSync(pool)

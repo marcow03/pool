@@ -1,7 +1,7 @@
 import express from 'express';
 import multer from 'multer'
 import morgan from 'morgan'
-import {filterPool, makeZip, cleanTmp, cleanPool, getContent, isEmpty, pool, web} from './library'
+import {filterPool, makeZip, cleanTmp, cleanPool, getContent, isEmpty, initWorkspace, pool, web} from './library'
 
 const app = express()
 const port: number = 8080
@@ -9,8 +9,10 @@ const port: number = 8080
 app.use(morgan('short'))
 app.use(express.static(web))
 
+initWorkspace()
+
 app.get('/api/list/:filter?/:method?', (req, res) => {
-    const files: string[] = filterPool(req.params.filter, req.params.method)
+    const files: string[] = filterPool(req.params.filter, req.params.method !== undefined ? req.params.method : 'match')
     res.send(files)
 })
 
@@ -27,18 +29,18 @@ app.get('/api/pull/:filter?/:method?', async (req, res) => {
 })
 
 app.get('/api/rm/:filter?/:method?', async (req, res) => {
-    const files: string[] = filterPool(req.params.filter, req.params.method !== undefined ? req.params.method : 'exact')
+    const files: string[] = filterPool(req.params.filter, req.params.method)
     await cleanPool(files)
-    res.sendStatus(200)
+    res.redirect('/')
 })
 
 app.get('/api/get/:file', async (req, res) => {
     const files: string[] = filterPool(req.params.file, 'exact')
     if(files.length === 1){
         const file: string = await getContent(files[0])
-        res.send(file)
+        res.setHeader("Content-Type", "text/plain").send(file)
     } else {
-        res.send('none or multiple file found')
+        res.send('none or multiple files found')
     }
 })
 

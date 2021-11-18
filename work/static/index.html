@@ -19,9 +19,9 @@
                         </div>
                     </form>
                 </div>
-                <div class="main-body-form-remove">
-                    <input type="text" class="main-body-form-remove-textfield">
-                    <input type="button" class="main-body-form-remove-button" value="remove" onclick="removeFiles()">
+                <div class="main-body-form-customquery">
+                    <input type="text" class="main-body-form-customquery-textfield" value="/api/">
+                    <input type="button" class="main-body-form-customquery-button" value="send" onclick="sendCustomQuery()">
                 </div>
                 <div class="main-body-form-search">
                     <input type="text" class="main-body-form-search-textfield" onchange="searchFiles()">
@@ -52,7 +52,7 @@
             var row = '<tr>'
             for(var c = 0; c < 10; c++){
                 if(files[i] == undefined){break}
-                row = `${row}<td><a href='/api/pull/${files[i]}'>${files[i]}</a></td>`
+                row = row + `<td><a href='/api/get/${files[i]}'>${files[i]}</a> <a href='/api/pull/${files[i]}'>V</a> <a href='/api/rm/${files[i]}'>X</a></td>`
                 i++
             }
             rows = rows + row
@@ -60,9 +60,9 @@
         table.innerHTML = rows
     }
 
-    async function removeFiles(){
-        const filter = document.querySelector('.main-body-form-remove-textfield').value
-        await fetch(`/api/rm/${filter}`)
+    async function sendCustomQuery(){
+        const route = document.querySelector('.main-body-form-customquery-textfield').value
+        await fetch(route)
         renderTable()
     }
 
