@@ -50,7 +50,7 @@
         var i = 0
         while(i < files.length){
             var row = '<tr>'
-            for(var c = 0; c < 10; c++){
+            for(var c = 0; c < 5; c++){
                 if(files[i] == undefined){break}
                 row = row + `<td><a href='/api/get/${files[i]}'>${files[i]}</a> <a href='/api/pull/${files[i]}'>V</a> <a href='/api/rm/${files[i]}'>X</a></td>`
                 i++
