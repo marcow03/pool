@@ -1,0 +1,106 @@
+#!/bin/bash
+
+script_name="poolctl"
+base_url="<pool-url>"
+install_path="/usr/local/bin/$script_name"
+
+# Function to list files
+list_files() {
+    if [ -z "$1" ]; then
+        output=$(curl -s $base_url/ls)
+    else
+        output=$(curl -s $base_url/ls/"$1")
+    fi
+
+    if command -v jq &> /dev/null; then
+        echo $output | jq -r '.[] | "\(.name) \(.size_bytes)B \(.modification_time)"' | column -t
+    else
+        echo $output
+    fi
+}
+
+# Function to get file contents (raw)
+get_file() {
+    if [ -z "$1" ]; then
+        echo "Usage: $script_name get <filename>"
+    else
+        curl $base_url/cat/"$1"
+    fi
+}
+
+# Function to push a file
+push_file() {
+    if [ -z "$1" ]; then
+        echo "Usage: $script_name push <path to file>"
+    else
+        curl $base_url/push -s -k -F files=@"$1" > /dev/null
+    fi
+}
+
+# Function to pull a file or files
+pull_file() {
+    if [ -z "$1" ]; then
+        echo "Usage: $script_name pull <filename or pattern>"
+    else
+        curl $base_url/pull/"$1" -O -s
+    fi
+}
+
+# Function to remove a file or files
+remove_file() {
+    if [ -z "$1" ]; then
+        echo "Usage: $script_name remove <filename or pattern>"
+    else
+        curl $base_url/rm/"$1" -s > /dev/null
+    fi
+}
+
+# Function to install the script
+install_script() {
+    # Copy script to /usr/local/bin and make it executable
+    sudo cp "$0" "$install_path"
+    sudo chmod +x "$install_path"
+
+    echo "Script installed to $install_path"
+    echo "Add the following line to your .bashrc or .zshrc to use it from any location:"
+    echo "export PATH=\"/usr/local/bin:\$PATH\""
+}
+
+# Function to display usage
+display_usage() {
+    echo "Usage: $script_name <command> [options]"
+    echo
+    echo "Commands:"
+    echo "  ls|list <filename|pattern>   List file(s)"
+    echo "  get <filename>               Get file contents (raw)"
+    echo "  push <path-to-file>          Push file"
+    echo "  pull <filename|pattern>      Pull file(s)"
+    echo "  rm|remove <filename|pattern> Remove file(s)"
+    echo "  install                      Install this script"
+    echo
+}
+
+# Main command handling
+case "$1" in
+    ls|list)
+        list_files "$2"
+        ;;
+    cat|get)
+        get_file "$2"
+        ;;
+    push)
+        push_file "$2"
+        ;;
+    pull)
+        pull_file "$2"
+        ;;
+    rm|remove)
+        remove_file "$2"
+        ;;
+    install)
+        install_script
+        ;;
+    *)
+        display_usage
+        ;;
+esac

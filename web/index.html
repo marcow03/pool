@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="shortcut icon" href="favicon.png">
+    </head>
+    <body>
+        <div class="header">
+            <h1>pool<h1>
+            <img src="favicon.png" width="50px">
+        </div>
+        <hr>
+        <div>
+            <div class="form-container">
+                <div>
+                    <form id="upload-form" method="post" enctype="multipart/form-data">
+                        <div>
+                            <input type="file" id="files" name="files" multiple />
+                            <button>upload</button>
+                        </div>
+                    </form>
+                </div>
+                <div>
+                    <input type="text" id="custom-query-textfield" value="/">
+                    <input type="button" id="custom-query-button" value="send" onclick="sendCustomQuery()">
+                </div>
+                <div>
+                    <input type="text" id="search-textfield" onchange="searchFiles()">
+                    <input type="button" id="search-button" value="search" onclick="searchFiles()">
+                </div>
+            </div>
+            <hr>
+            <div class="table">
+                <table>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <hr>
+        <div class="footer">
+            <div>
+                <a href="/help">help</a>
+                <a href="/poolctl">install script</a>
+            </div>
+        </div>
+    </body>
+</html>
+
+<script>
+    document.onload = renderTable()
+
+    document.getElementById('upload-form')
+        .addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+
+            await fetch('/push', {
+                method: 'POST',
+                body: formData,
+            })
+
+            renderTable()
+        }
+    )
+
+    async function renderTable(filter = '') {
+        const table = document.querySelector('tbody')
+        const files = (await (await fetch(`/ls/${filter}`)).json())
+
+        let rows = ''
+        let i = 0
+
+        while (i < files.length) {
+            let row = '<tr>'
+
+            for (let c = 0; c < 5; c++) {
+                if (files[i] == undefined) break
+                let fileName = files[i].name
+
+                row = row + `
+                <td>
+                    <a href='/cat/${fileName}'>${fileName}</a>
+                    <a href='/pull/${fileName}'>V</a>
+                    <a href='' onclick="fetch('/rm/${fileName}')">X</a>
+                </td>
+                `
+
+                i++
+            }
+
+            rows = rows + row
+        }
+
+        table.innerHTML = rows
+    }
+
+    async function sendCustomQuery() {
+        const route = document.getElementById('custom-query-textfield').value
+        await fetch(route)
+        renderTable()
+    }
+
+    async function searchFiles() {
+        const filter = document.getElementById('search-textfield').value
+        renderTable(filter)
+    }
+</script>
+
+<style>
+    body {
+        margin: 5rem !important;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .form-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+    }
+
+    .form-container div {
+        margin: 0 1rem;
+    }
+
+    table {
+        width: 100%;
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+
+    .table td {
+        border: 1px solid black;
+        width: calc(100% / 10);
+        text-align: center;
+    }
+
+    .footer {
+        text-align: right;
+        font-size: small;
+    }
+</style>
