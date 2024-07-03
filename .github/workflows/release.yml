@@ -1,0 +1,33 @@
+name: Build and publish release for pool
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.22.x
+
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Build linux executable
+        run: GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o /bin/pool-linux .
+      - name: Build windows executable
+        run: GOOS=windows GOARCH=amd64 go build -a -installsuffix cgo -o /bin/pool-windows.exe .
+      - name: Build darwin executable
+        run: GOOS=darwin GOARCH=arm64 go build -a -installsuffix cgo -o /bin/pool-macos .
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            /bin/pool-linux
+            /bin/pool-windows.exe
+            /bin/pool-macos
