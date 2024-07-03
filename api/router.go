@@ -1,9 +1,8 @@
-package main
+package api
 
 import (
 	"io/fs"
 	"net/http"
-	"pool/api"
 	"pool/config"
 
 	"github.com/go-chi/chi/v5"
@@ -12,11 +11,13 @@ import (
 )
 
 func NewRouter(config *config.Config, staticContentFS fs.FS) *chi.Mux {
-	handlers := api.Handler{Config: config}
+	handlers := Handlers{Config: config}
 
 	r := chi.NewRouter()
 
-	r.Use(middleware.Logger)
+	if config.Debug {
+		r.Use(middleware.Logger)
+	}
 	r.Use(render.SetContentType(render.ContentTypeJSON))
 
 	r.Handle("/*", http.FileServer(http.FS(staticContentFS)))

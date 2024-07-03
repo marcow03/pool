@@ -13,37 +13,37 @@ import (
 	"github.com/go-chi/render"
 )
 
-type Handler struct {
+type Handlers struct {
 	Config *config.Config
 }
 
-func (h Handler) HelpHandler(w http.ResponseWriter, r *http.Request) {
+func (h Handlers) HelpHandler(w http.ResponseWriter, r *http.Request) {
 	var content = strings.ReplaceAll(assets.HelpFile, "<pool-url>", internal.GetRequestPath(r))
 
 	render.PlainText(w, r, content)
 }
 
-func (h Handler) GetPoolCtlHandler(w http.ResponseWriter, r *http.Request) {
+func (h Handlers) GetPoolCtlHandler(w http.ResponseWriter, r *http.Request) {
 	var content = strings.ReplaceAll(assets.PoolCtlFile, "<pool-url>", internal.GetRequestPath(r))
 
 	render.PlainText(w, r, content)
 }
 
-func (h Handler) ListHandler(w http.ResponseWriter, r *http.Request) {
+func (h Handlers) ListHandler(w http.ResponseWriter, r *http.Request) {
 	pattern := chi.URLParam(r, "pattern")
 	files := internal.GetPoolFiles(h.Config.PoolDir, pattern)
 
 	render.JSON(w, r, files)
 }
 
-func (h Handler) GetHandler(w http.ResponseWriter, r *http.Request) {
+func (h Handlers) GetHandler(w http.ResponseWriter, r *http.Request) {
 	file := chi.URLParam(r, "file")
 	content := internal.GetPoolFileContent(h.Config.PoolDir, file)
 
 	render.PlainText(w, r, string(content))
 }
 
-func (h Handler) PullHandler(w http.ResponseWriter, r *http.Request) {
+func (h Handlers) PullHandler(w http.ResponseWriter, r *http.Request) {
 	file := chi.URLParam(r, "file")
 	content, filename, err := internal.PullPoolFiles(h.Config.PoolDir, file)
 	if err != nil {
@@ -55,14 +55,14 @@ func (h Handler) PullHandler(w http.ResponseWriter, r *http.Request) {
 	render.Data(w, r, []byte(content))
 }
 
-func (h Handler) RemoveHandler(w http.ResponseWriter, r *http.Request) {
+func (h Handlers) RemoveHandler(w http.ResponseWriter, r *http.Request) {
 	file := chi.URLParam(r, "file")
 	internal.RemovePoolFile(h.Config.PoolDir, file)
 
 	render.Status(r, http.StatusNoContent)
 }
 
-func (h Handler) UploadHandler(w http.ResponseWriter, r *http.Request) {
+func (h Handlers) UploadHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse all files up to 5GB from the request
 	err := r.ParseMultipartForm(5 << 30)
 	if err != nil {
