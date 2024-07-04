@@ -37,9 +37,7 @@ func main() {
 		Handler: api.NewRouter(&config, fileSystem),
 	}
 
-	if config.Debug {
-		log.Printf("Listening on %s and saving pool files to %s", *address, *poolDir)
-	}
+	log.Printf("Listening on %s and saving pool files to %s", *address, *poolDir)
 
 	server.ListenAndServe()
 }
