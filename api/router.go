@@ -3,7 +3,8 @@ package api
 import (
 	"io/fs"
 	"net/http"
-	"pool/config"
+
+	"github.com/marcow03/pool/config"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"

@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"pool/assets"
-	"pool/config"
-	"pool/internal"
 	"strings"
+
+	"github.com/marcow03/pool/assets"
+	"github.com/marcow03/pool/config"
+	"github.com/marcow03/pool/internal"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"

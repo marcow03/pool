@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"pool/internal/models"
 	"strings"
+
+	"github.com/marcow03/pool/internal/models"
 )
 
 func InitPoolDir(path string) error {

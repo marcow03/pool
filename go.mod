@@ -1,4 +1,4 @@
-module pool
+module github.com/marcow03/pool
 
 go 1.22
 

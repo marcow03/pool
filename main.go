@@ -5,10 +5,11 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
-	"pool/api"
-	"pool/assets"
-	"pool/config"
-	"pool/internal"
+
+	"github.com/marcow03/pool/api"
+	"github.com/marcow03/pool/assets"
+	"github.com/marcow03/pool/config"
+	"github.com/marcow03/pool/internal"
 )
 
 func main() {
