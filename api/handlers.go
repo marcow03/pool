@@ -9,6 +9,7 @@ import (
 	"github.com/marcow03/pool/assets"
 	"github.com/marcow03/pool/config"
 	"github.com/marcow03/pool/internal"
+	"github.com/mileusna/useragent"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
@@ -25,7 +26,24 @@ func (h Handlers) HelpHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h Handlers) GetPoolCtlHandler(w http.ResponseWriter, r *http.Request) {
-	var content = strings.ReplaceAll(assets.PoolCtlFile, "<pool-url>", internal.GetRequestPath(r))
+	var plattform = r.URL.Query().Get("plattform")
+	var agent = useragent.Parse(r.UserAgent())
+
+	// Not very useful, just for consistency
+	// If no plattform is given and the user agent is known, redirect to the plattform
+	// So that the user sees how the url scheme works in the browser
+	// And can use the same url when curl'ing in the command line
+	if plattform == "" && !agent.IsUnknown() {
+		http.Redirect(w, r, fmt.Sprintf("%s?plattform=%s", r.RequestURI, strings.ToLower(agent.OS)), http.StatusSeeOther)
+		return
+	}
+
+	var content string
+	if plattform == "windows" || agent.IsWindows() {
+		content = strings.ReplaceAll(assets.PoolCtlFileWin, "<pool-url>", internal.GetRequestPath(r))
+	} else {
+		content = strings.ReplaceAll(assets.PoolCtlFile, "<pool-url>", internal.GetRequestPath(r))
+	}
 
 	render.PlainText(w, r, content)
 }
