@@ -12,9 +12,12 @@ import (
 	"github.com/marcow03/pool/internal"
 )
 
+var DEFUALT_POOL_DIR = "pool_data"
+var DEFAULT_ADDRESS = ":8080"
+
 func main() {
-	address := flag.String("addr", ":8080", "Address to listen on in the form of <address:port>")
-	poolDir := flag.String("path", "./pool", "Directory to store pool files")
+	address := flag.String("addr", DEFAULT_ADDRESS, "Address to listen on in the form of <address:port>")
+	poolDir := flag.String("path", DEFUALT_POOL_DIR, "Directory to store pool files")
 	debug := flag.Bool("debug", false, "Enable debug mode")
 	flag.Parse()
 
