@@ -23,13 +23,7 @@ It has the following **Use-Cases** (at least for me):
 ## Getting Started
 
 1. Download the latest release.
-2. Make the binary executable.
-
-    ```bash
-    # On Linux and MacOS.
-    chmod +x pool
-    ```
-
+2. Unpack the archive.
 3. Start the pool server.
 
     ```bash
