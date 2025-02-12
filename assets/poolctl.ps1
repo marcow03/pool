@@ -1,6 +1,7 @@
 $scriptName = "poolctl"
 $baseUrl = "<pool-url>"
 $installPath = "$env:ProgramFiles\$scriptName"
+$clipboardFile = "$env:TEMP\$scriptName-clipboard.txt"
 
 # Function to list files
 function Get-PoolFiles {
@@ -64,6 +65,18 @@ function Remove-PoolFile {
     Invoke-RestMethod -Uri "$baseUrl/rm/$Pattern" -Method Delete
 }
 
+# Function to push clipboard content
+function Push-PoolClipboard {
+    Get-Clipboard -Raw | Out-File -FilePath $clipboardFile
+    Invoke-RestMethod -Uri "$baseUrl/push" -Method Post -Form @{files = Get-Item -Path $clipboardFile}
+}
+
+# Function to pull clipboard content
+function Get-PoolClipboard {
+    Invoke-RestMethod -Uri "$baseUrl/pull/$clipboardFile" -OutFile $clipboardFile
+    Get-Content -Path $clipboardFile | Set-Clipboard
+}
+
 # Function to install the script
 function Install-PoolScript {
     Copy-Item $MyInvocation.MyCommand.Path $installPath
@@ -77,10 +90,12 @@ function Show-PoolUsage {
     Write-Host "Usage: $scriptName <command> [options]`n"
     Write-Host "Commands:"
     Write-Host "  ls|list <filename|pattern>   List file(s)"
-    Write-Host "  get <filename>               Get file contents (raw)"
+    Write-Host "  get|cat <filename>           Get file contents (raw)"
     Write-Host "  push <path-to-file>          Push file"
     Write-Host "  pull <filename|pattern>      Pull file(s)"
     Write-Host "  rm|remove <filename|pattern> Remove file(s)"
+    Write-Host "  c|clipboard-push             Push clipboard content"
+    Write-Host "  p|clipboard-pull             Pull clipboard content"
     Write-Host "  install                      Install this script`n"
 }
 
@@ -91,6 +106,8 @@ switch ($args[0]) {
     "push" { Push-PoolFile -FilePath $args[1] }
     "pull" { Get-PoolFile -Pattern $args[1] }
     { $_ -in "rm", "remove" } { Remove-PoolFile -Pattern $args[1] }
+    { $_ -in "c", "clipboard-push" } { Push-PoolClipboard }
+    { $_ -in "p", "clipboard-pull" } { Get-PoolClipboard }
     "install" { Install-PoolScript }
     default { Show-PoolUsage }
 }

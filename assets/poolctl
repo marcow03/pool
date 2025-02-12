@@ -3,6 +3,7 @@
 script_name="poolctl"
 base_url="<pool-url>"
 install_path="/usr/local/bin/$script_name"
+clipboard_file="$HOME/.pool/clipboard"
 
 # Function to list files
 list_files() {
@@ -55,6 +56,32 @@ remove_file() {
     fi
 }
 
+# Function to push clipboard contents
+push_clipboard() {
+    mkdir -p $(dirname $clipboard_file)
+
+    if command -v xclip &> /dev/null; then
+        xclip -o -selection clipboard > $clipboard_file
+        curl $base_url/push -s -k -F files=@"$clipboard_file" > /dev/null
+    elif command -v pbpaste &> /dev/null; then
+        pbpaste > $clipboard_file
+        curl $base_url/push -s -k -F files=@"$clipboard_file" > /dev/null
+    else
+        echo "xclip or pbcopy is required for this operation"
+    fi
+}
+
+# Function to pull clipboard contents
+pull_clipboard() {
+    if command -v xclip &> /dev/null; then
+        curl $base_url/cat/clipboard -s | xclip -selection clipboard
+    elif command -v pbcopy &> /dev/null; then
+        curl $base_url/cat/clipboard -s | pbcopy
+    else
+        echo "xclip or pbcopy is required for this operation"
+    fi
+}
+
 # Function to install the script
 install_script() {
     # Copy script to /usr/local/bin and make it executable
@@ -72,10 +99,12 @@ display_usage() {
     echo
     echo "Commands:"
     echo "  ls|list <filename|pattern>   List file(s)"
-    echo "  get <filename>               Get file contents (raw)"
+    echo "  get|cat <filename>           Get file contents (raw)"
     echo "  push <path-to-file>          Push file"
     echo "  pull <filename|pattern>      Pull file(s)"
     echo "  rm|remove <filename|pattern> Remove file(s)"
+    echo "  c|clipboard-push             Push clipboard contents"
+    echo "  v|clipboard-pull             Pull clipboard contents"
     echo "  install                      Install this script"
     echo
 }
@@ -99,6 +128,12 @@ case "$1" in
         ;;
     install)
         install_script
+        ;;
+    c|clipboard-push)
+        push_clipboard
+        ;;
+    v|clipboard-pull)
+        pull_clipboard
         ;;
     *)
         display_usage
