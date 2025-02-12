@@ -8,9 +8,9 @@ clipboard_file="$HOME/.pool/clipboard"
 # Function to list files
 list_files() {
     if [ -z "$1" ]; then
-        output=$(curl -s $base_url/ls)
+        output=$(curl -skL $base_url/ls)
     else
-        output=$(curl -s $base_url/ls/"$1")
+        output=$(curl -skL $base_url/ls/"$1")
     fi
 
     if command -v jq &> /dev/null; then
@@ -25,7 +25,7 @@ get_file() {
     if [ -z "$1" ]; then
         echo "Usage: $script_name get <filename>"
     else
-        curl $base_url/cat/"$1"
+        curl -skL $base_url/cat/"$1"
     fi
 }
 
@@ -34,7 +34,7 @@ push_file() {
     if [ -z "$1" ]; then
         echo "Usage: $script_name push <path to file>"
     else
-        curl $base_url/push -s -k -F files=@"$1" > /dev/null
+        curl -skL $base_url/push -F files=@"$1" > /dev/null
     fi
 }
 
@@ -43,7 +43,7 @@ pull_file() {
     if [ -z "$1" ]; then
         echo "Usage: $script_name pull <filename or pattern>"
     else
-        curl $base_url/pull/"$1" -O -s
+        curl -skL $base_url/pull/"$1" -O
     fi
 }
 
@@ -52,7 +52,7 @@ remove_file() {
     if [ -z "$1" ]; then
         echo "Usage: $script_name remove <filename or pattern>"
     else
-        curl $base_url/rm/"$1" -s > /dev/null
+        curl -skL $base_url/rm/"$1" > /dev/null
     fi
 }
 
@@ -62,10 +62,10 @@ push_clipboard() {
 
     if command -v xclip &> /dev/null; then
         xclip -o -selection clipboard > $clipboard_file
-        curl $base_url/push -s -k -F files=@"$clipboard_file" > /dev/null
+        curl -skL $base_url/push -F files=@"$clipboard_file" > /dev/null
     elif command -v pbpaste &> /dev/null; then
         pbpaste > $clipboard_file
-        curl $base_url/push -s -k -F files=@"$clipboard_file" > /dev/null
+        curl -skL $base_url/push -F files=@"$clipboard_file" > /dev/null
     else
         echo "xclip or pbcopy is required for this operation"
     fi
@@ -74,9 +74,9 @@ push_clipboard() {
 # Function to pull clipboard contents
 pull_clipboard() {
     if command -v xclip &> /dev/null; then
-        curl $base_url/cat/clipboard -s | xclip -selection clipboard
+        curl -skL $base_url/cat/clipboard | xclip -selection clipboard
     elif command -v pbcopy &> /dev/null; then
-        curl $base_url/cat/clipboard -s | pbcopy
+        curl -skL $base_url/cat/clipboard | pbcopy
     else
         echo "xclip or pbcopy is required for this operation"
     fi
