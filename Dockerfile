@@ -1,10 +1,10 @@
-FROM golang:1.22.0 as builder
+FROM golang:1.22.0 AS builder
 
 WORKDIR /src
 COPY . /src/
 RUN CGO_ENABLED=0 GOOS=linux go build -a -o /bin/pool .
 
-FROM alpine:latest
+FROM alpine
 
 COPY --from=builder /bin/pool /bin/pool
 EXPOSE 8080
