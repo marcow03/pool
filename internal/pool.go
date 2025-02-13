@@ -108,7 +108,11 @@ func PullPoolFiles(path string, pattern string) ([]byte, string, error) {
 }
 
 func RemovePoolFile(path string, file string) {
-	os.Remove(filepath.Join(path, file))
+	files := GetPoolFiles(path, file)
+
+	for _, file := range files {
+		os.Remove(filepath.Join(path, file.Name))
+	}
 }
 
 func SavePoolFile(path string, filename string, content []byte) error {
