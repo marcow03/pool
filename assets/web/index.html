@@ -20,10 +20,6 @@
                     </form>
                 </div>
                 <div>
-                    <input type="text" id="custom-query-textfield" value="/">
-                    <input type="button" id="custom-query-button" value="send" onclick="sendCustomQuery()">
-                </div>
-                <div>
                     <input type="text" id="search-textfield" onchange="searchFiles()">
                     <input type="button" id="search-button" value="search" onclick="searchFiles()">
                 </div>
@@ -94,12 +90,6 @@
         table.innerHTML = rows
     }
 
-    async function sendCustomQuery() {
-        const route = document.getElementById('custom-query-textfield').value
-        await fetch(route)
-        renderTable()
-    }
-
     async function searchFiles() {
         const filter = document.getElementById('search-textfield').value
         renderTable(filter)
@@ -119,7 +109,7 @@
     .form-container {
         display: flex;
         align-items: center;
-        justify-content: space-evenly;
+        justify-content: space-between;
     }
 
     .form-container div {
