@@ -38,15 +38,24 @@ It has the following **Use-Cases** (at least for me):
 
 ## Getting Started
 
-1. Download the latest release.
-2. Unpack the archive.
-3. Start the pool server.
+### Using a precompiled binary
 
-    ```sh
+1. Download the [latest release](https://github.com/marcow03/pool/releases)
+2. Unpack the archive
+3. Start the pool server
+
+    ```txt
     ./pool [ -addr "localhost:80" -path "./pool-files" ]
     ```
 
-### Prerequisites
+### Using Docker
 
-- curl (for command-line interactions)
-- jq (optional, for formatted output in command-line)
+```sh
+docker run --name pool -v ./pool-files:/data ghcr.io/marcow03/pool:latest
+```
+
+## Prerequisites (client-side and only MacOS/Linux)
+
+- `curl` (for command-line interactions)
+- `jq` (optional, for formatted output in command-line)
+- `pbcopy`/`pbpaste` or `xclip` (to use clipboard functionality)
