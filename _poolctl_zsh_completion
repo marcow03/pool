@@ -1,0 +1,37 @@
+#compdef poolctl
+
+_poolctl() {
+  local -a commands
+  commands=(
+    'ls:list files'
+    'list:list files'
+    'get:get file contents'
+    'cat:get file contents'
+    'push:push a file'
+    'pull:pull a file'
+    'rm:remove a file'
+    'remove:remove a file'
+    'c:push clipboard contents'
+    'clipboard-push:push clipboard contents'
+    'v:pull clipboard contents'
+    'clipboard-pull:pull clipboard contents'
+    'install:install the script'
+  )
+
+  _arguments \
+    '1:command:->cmds' \
+    '2:filename or pattern:->files'
+
+  case $state in
+    cmds)
+      _describe 'command' commands
+      ;;
+    files)
+      local -a files
+      files=($(poolctl ls | awk '{print $1}'))
+      _values 'files' $files
+      ;;
+  esac
+}
+
+compdef _poolctl poolctl
