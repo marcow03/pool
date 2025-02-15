@@ -1,5 +1,3 @@
-#compdef poolctl
-
 _poolctl() {
   local -a commands
   commands=(
@@ -27,11 +25,16 @@ _poolctl() {
       _describe 'command' commands
       ;;
     files)
-      local -a files
-      files=($(poolctl ls | awk '{print $1}'))
-      _values 'files' $files
+      if [[ $words[2] == "push" ]]; then
+        _files
+      else
+        local -a files
+        files=($(poolctl ls | awk '{print $1}'))
+        _values 'files' $files
+      fi
       ;;
   esac
 }
 
 compdef _poolctl poolctl
+
